@@ -66,3 +66,14 @@ python -m experiments.run --suite sanity
 ```
 
 The sanity command checks the exact sparse comparator, compact support of `X`, serial dependence, and the moment condition used for Huber curvature.
+
+## Real-data forecasting: four-task benchmark
+
+The focused real-data benchmark retains only **Beijing Aotizhongxin, Beijing Changping, FRED TB3, and FRED TB6**. It compares LS-DNN, Huber-DNN, LS-SPDNN and Huber-SPDNN using 30 model-initialization repetitions, a fixed chronological 60/20/20 split, and test MAE/RMSE. See [REAL_DATA.md](REAL_DATA.md) for dataset sources, limitations, and full commands.
+
+```bash
+python -m experiments.real_data --download-only
+python -m experiments.real_data --reps 30 --output-root results/real_four_30
+```
+
+Four-task reference results from the previous local runs are in [reference/real_data_30reps_summary.csv](reference/real_data_30reps_summary.csv) and [reference/real_data_30reps_per_replication.csv](reference/real_data_30reps_per_replication.csv). **The retained datasets were selected after inspecting six tasks**, so the reported four-task win rate is exploratory, not a held-out confirmatory generalization claim.
