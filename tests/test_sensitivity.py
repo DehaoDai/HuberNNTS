@@ -41,10 +41,12 @@ class SensitivityTests(unittest.TestCase):
                     "sem_prediction_error": "0.002",
                     "mean_population_target_bias_sq": "0.025",
                 }
-        for family in "ABC":
-            dependence_table = render_dependence(index, 2, family)
-            self.assertEqual(dependence_table.count("0.1000(0.0020)"), 9)
-            self.assertIn(f"DGP {ord(family) - ord('A') + 1}", dependence_table)
+        dependence_table = render_dependence(index, 2)
+        self.assertEqual(dependence_table.count("0.1000(0.0020)"), 27)
+        self.assertIn(r"Data & $\rho_X$ & $\rho_\varepsilon$", dependence_table)
+        self.assertIn(r"\begin{adjustbox}{max width=\linewidth}", dependence_table)
+        for dgp in (1, 2, 3):
+            self.assertIn(rf"\multirow{{9}}{{*}}{{DGP {dgp}}}", dependence_table)
         tail_table = render_tail(index, 2)
         self.assertEqual(tail_table.count("0.0250"), 6)
         self.assertEqual(tail_table.count(r"\textbf{0.1000(0.0020)}"), 6)
@@ -53,13 +55,13 @@ class SensitivityTests(unittest.TestCase):
         del index[(next(case for case in cases_for("dependence")
                          if case.family == "B").case_id, "LS-DNN")]
         with self.assertRaisesRegex(ValueError, "Missing LS-DNN"):
-            render_dependence(index, 2, "B")
+            render_dependence(index, 2)
 
     def test_reference_results_cover_all_sensitivity_cases(self):
         index = load_summaries(ROOT / "reference/sensitivity_aggregate_summary.csv")
         self.assertEqual(len(index), 33 * len(METHODS))
         rendered = "\n\n".join([
-            *(render_dependence(index, 100, family) for family in "ABC"),
+            render_dependence(index, 100),
             render_tail(index, 100),
         ]) + "\n"
         self.assertEqual(rendered,
