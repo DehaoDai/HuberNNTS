@@ -10,19 +10,25 @@ from .run import METHODS, cases_for
 from .tables import DISPLAY, load_summaries, method_cells, table
 
 
-def render_dependence(index, min_reps):
+def render_dependence(index, min_reps, family="A"):
+    if family not in ("A", "B", "C"):
+        raise ValueError(f"Unknown DGP family: {family}")
     body = []
-    for case in cases_for("dependence"):
+    for case in (case for case in cases_for("dependence")
+                 if case.family == family):
         body.append(" & ".join([
             f"{case.rho_x:g}", f"{case.rho_e:g}",
             *method_cells(index, case, METHODS, min_reps),
         ]) + r"\\")
+    dgp = ord(family) - ord("A") + 1
+    beta = "0.7" if family == "C" else "0"
     return table(
-        r"Dependence-strength sweep for symmetric stable noise "
-        r"($\alpha=1.5$, $\beta=0$) at $n=800$, $d=256$, $\tau=8$. "
+        rf"Dependence-strength sweep for DGP {dgp} "
+        rf"($\alpha=1.5$, $\beta={beta}$) at $n=800$, $d=256$, $\tau=8$. "
         r"Entries are prediction MSE (Monte Carlo SE); boldface marks the "
         r"best full-input estimator. Oracle-Huber uses true active inputs.",
-        "tab:dependence-strength", "rrccccc",
+        "tab:dependence-strength" if family == "A"
+        else f"tab:dependence-strength-dgp{dgp}", "rrccccc",
         r"$\rho_X$ & $\rho_\varepsilon$ & "
         + " & ".join(DISPLAY[method] for method in METHODS), body,
     )
@@ -67,7 +73,8 @@ def main():
         parser.error("--min-reps must be positive")
     index = load_summaries(args.input)
     rendered = "\n\n".join((
-        render_dependence(index, args.min_reps),
+        *(render_dependence(index, args.min_reps, family)
+          for family in ("A", "B", "C")),
         render_tail(index, args.min_reps),
     )) + "\n"
     args.output.parent.mkdir(parents=True, exist_ok=True)
