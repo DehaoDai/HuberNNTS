@@ -43,19 +43,24 @@ Data & $\rho_X$ & $\rho_\varepsilon$ & LS-DNN & Huber-DNN & LS-SPDNN & Huber-SPD
 
 \begin{table}[!ht]
 \centering
-\caption{Stable-tail and skewness sweep at $n=800$, $d=256$, $(\rho_X,\rho_\varepsilon)=(0.5,0.5)$. $\beta=0$ is symmetric and $\beta=0.7$ is skewed. Bias$^2$ is the squared gap between the clipped population Huber target and $f_0$, averaged over the test covariates. Other entries are prediction MSE (Monte Carlo SE); boldface marks the best full-input estimator. The common $\tau=14$ satisfies the stated curvature check.}
+\caption{Stable-tail sweep for DGPs 1--3 at $n=800$, $d=256$, $(\rho_X,\rho_\varepsilon)=(0.5,0.5)$. DGPs 1 and 2 have symmetric errors ($\beta=0$); DGP 3 has skewed errors ($\beta=0.7$). DGPs 1 and 3 share the regression function, so their contrast isolates skewness. Bias$^2$ is the squared gap between the clipped population Huber target and $f_0$, averaged over the test covariates. Other entries are prediction MSE (Monte Carlo SE); boldface marks the best full-input estimator. The common $\tau=14$ satisfies the stated curvature check.}
 \label{tab:stable-tail-skew}
 \begin{adjustbox}{max width=\linewidth}
-\begin{tabular}{@{}rrrrccccc@{}}
+\begin{tabular}{@{}lrrrrccccc@{}}
 \toprule
-$\alpha$ & $\beta$ & $\tau$ & Bias$^2$ & LS-DNN & Huber-DNN & LS-SPDNN & Huber-SPDNN & Oracle-Huber\\
+Data & $\alpha$ & $\beta$ & $\tau$ & Bias$^2$ & LS-DNN & Huber-DNN & LS-SPDNN & Huber-SPDNN & Oracle-Huber\\
 \midrule
-1.35 & 0 & 14 & 0.0000 & 0.1585(0.0129) & 0.1166(0.0035) & 0.1742(0.0154) & \textbf{0.1159(0.0038)} & 0.0800(0.0041)\\
-1.35 & 0.7 & 14 & 0.0638 & 0.1825(0.0103) & 0.1750(0.0066) & 0.2065(0.0137) & \textbf{0.1724(0.0068)} & 0.1452(0.0080)\\
-1.5 & 0 & 14 & 0.0000 & 0.1274(0.0076) & 0.1036(0.0027) & 0.1293(0.0091) & \textbf{0.1024(0.0033)} & 0.0658(0.0037)\\
-1.5 & 0.7 & 14 & 0.0100 & 0.1319(0.0076) & 0.1112(0.0030) & 0.1362(0.0088) & \textbf{0.1077(0.0035)} & 0.0751(0.0045)\\
-1.8 & 0 & 14 & 0.0000 & 0.0888(0.0024) & 0.0846(0.0017) & 0.0842(0.0029) & \textbf{0.0778(0.0021)} & 0.0388(0.0025)\\
-1.8 & 0.7 & 14 & 0.0002 & 0.0886(0.0021) & 0.0854(0.0018) & 0.0796(0.0027) & \textbf{0.0737(0.0021)} & 0.0387(0.0025)\\
+\multirow{3}{*}{DGP 1} & 1.35 & 0 & 14 & 0.0000 & 0.1585(0.0129) & 0.1166(0.0035) & 0.1742(0.0154) & \textbf{0.1159(0.0038)} & 0.0800(0.0041)\\
+ & 1.5 & 0 & 14 & 0.0000 & 0.1274(0.0076) & 0.1036(0.0027) & 0.1293(0.0091) & \textbf{0.1024(0.0033)} & 0.0658(0.0037)\\
+ & 1.8 & 0 & 14 & 0.0000 & 0.0888(0.0024) & 0.0846(0.0017) & 0.0842(0.0029) & \textbf{0.0778(0.0021)} & 0.0388(0.0025)\\
+\midrule
+\multirow{3}{*}{DGP 2} & 1.35 & 0 & 14 & 0.0000 & 0.3253(0.0216) & 0.2478(0.0038) & 0.3315(0.0239) & \textbf{0.2382(0.0041)} & 0.1844(0.0055)\\
+ & 1.5 & 0 & 14 & 0.0000 & 0.2702(0.0101) & 0.2319(0.0039) & 0.2705(0.0121) & \textbf{0.2196(0.0035)} & 0.1583(0.0053)\\
+ & 1.8 & 0 & 14 & 0.0000 & 0.2157(0.0040) & 0.2072(0.0021) & 0.2012(0.0052) & \textbf{0.1879(0.0024)} & 0.1185(0.0040)\\
+\midrule
+\multirow{3}{*}{DGP 3} & 1.35 & 0.7 & 14 & 0.0638 & 0.1825(0.0103) & 0.1750(0.0066) & 0.2065(0.0137) & \textbf{0.1724(0.0068)} & 0.1452(0.0080)\\
+ & 1.5 & 0.7 & 14 & 0.0100 & 0.1319(0.0076) & 0.1112(0.0030) & 0.1362(0.0088) & \textbf{0.1077(0.0035)} & 0.0751(0.0045)\\
+ & 1.8 & 0.7 & 14 & 0.0002 & 0.0886(0.0021) & 0.0854(0.0018) & 0.0796(0.0027) & \textbf{0.0737(0.0021)} & 0.0387(0.0025)\\
 \bottomrule
 \end{tabular}
 \end{adjustbox}
