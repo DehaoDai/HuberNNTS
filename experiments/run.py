@@ -124,7 +124,9 @@ def cases_for(suite):
         ]
     if suite == "dependence":
         return [
-            Case("A", 800, 256, rho_x=rx, rho_e=re)
+            Case(family, 800, 256, rho_x=rx, rho_e=re,
+                 beta=0.7 if family == "C" else 0.0)
+            for family in ("A", "B", "C")
             for rx in (0.0, 0.5, 0.8)
             for re in (0.0, 0.5, 0.8)
         ]
