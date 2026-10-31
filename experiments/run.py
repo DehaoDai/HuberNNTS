@@ -124,11 +124,11 @@ def cases_for(suite):
         ]
     if suite == "dependence":
         return [
-            Case("A", 800, 256, rho_x=rx, rho_e=re)
-            for rx, re in (
-                (0.0, 0.0), (0.8, 0.0), (0.0, 0.8),
-                (0.5, 0.5), (0.8, 0.8),
-            )
+            Case(family, 800, 256, rho_x=rx, rho_e=re,
+                 beta=0.7 if family == "C" else 0.0)
+            for family in ("A", "B", "C")
+            for rx in (0.0, 0.5, 0.8)
+            for re in (0.0, 0.5, 0.8)
         ]
     if suite == "approximation":
         cases = [Case("B", n, 256) for n in (400, 800, 1600, 3200)]
@@ -146,9 +146,10 @@ def cases_for(suite):
         ]
     if suite == "tail":
         return [
-            Case("A", 800, 256, alpha=1.35, tau=14.0),
-            Case("A", 800, 256, alpha=1.5, tau=8.0),
-            Case("A", 800, 256, alpha=1.8, tau=8.0),
+            Case(family, 800, 256, alpha=alpha,
+                 beta=0.7 if family == "C" else 0.0, tau=14.0)
+            for family in ("A", "B", "C")
+            for alpha in (1.35, 1.5, 1.8)
         ]
     if suite == "paper":
         # The four tables in the Numerical Studies manuscript.
@@ -165,7 +166,7 @@ def cases_for(suite):
         for name in (
             "sample_size", "dimension", "sparsity", "dependence",
             "approximation", "bias", "bias_sample_size", "dimension_bc",
-            "sparsity_c",
+            "sparsity_c", "tail",
         ):
             for case in cases_for(name):
                 seen[case.case_id] = case

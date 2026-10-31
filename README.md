@@ -58,6 +58,15 @@ python -m experiments.tables --input reference/aggregate_summary.csv --output re
 
 To include the generated TeX in a paper, load `booktabs`, `multirow`, and `adjustbox` and use `\input{.../paper_tables.tex}`. The generated table file is a reference rendering of prior results; it does not replace running the experiments.
 
+Check all six numerical-study tables (the original four plus the two sensitivity tables) against the committed 100-replication CSV summaries with one command:
+
+```bash
+python -m experiments.reproduce_tables --check
+python -m experiments.reproduce_tables --output-dir results_tables
+```
+
+The first command regenerates both TeX files in a temporary directory, compares them byte for byte with `reference/`, and checks that cases shared by the two summary CSVs agree. The second writes fresh TeX copies to `results_tables/`. This verifies exact table rendering from the committed summaries; rerunning model fits is a separate step and may produce small platform-dependent differences.
+
 ## Checks
 
 ```bash
@@ -66,6 +75,26 @@ python -m experiments.run --suite sanity
 ```
 
 The sanity command checks the exact sparse comparator, compact support of `X`, serial dependence, and the moment condition used for Huber curvature.
+
+## Dependence and stable-tail sensitivity
+
+The `dependence` suite varies both AR coefficients over `{0, 0.5, 0.8}` for each of DGPs 1, 2, and 3 (nine settings per DGP, 27 total). DGP 3 uses skewed stable errors (`beta=0.7`); DGPs 1 and 2 use symmetric errors. All have `alpha=1.5`, `n=800`, `d=256`, and `tau=8`. Within each DGP, the marginal distributions of covariates and errors are held fixed as dependence changes. The renderer writes one dependence table with a `Data` column grouping nine rows per DGP; `adjustbox` fits its width to the text area.
+
+The `tail` suite varies stable indices `{1.35, 1.5, 1.8}` for each of DGPs 1, 2, and 3 (nine settings). DGPs 1 and 2 retain symmetric errors (`beta=0`); DGP 3 retains skewed errors (`beta=0.7`). DGPs 1 and 3 share the same regression function, so their contrast isolates the noise skewness; DGP 2 has a different signal and is shown as a separate robustness setting. All use `n=800` and `d=256`. There are 36 distinct settings across both suites. Stable scales are matched by marginal IQR across tail settings. The Huber threshold is held at 14 throughout the tail suite, satisfying the configured curvature check even at `alpha=1.35`.
+
+Check the matrices, then run both suites into one output directory:
+
+```bash
+python -m experiments.run --suite dependence --dry-run --reps 100
+python -m experiments.run --suite tail --dry-run --reps 100
+python -m experiments.run --suite dependence --reps 100 --workers 4 --output-root results_sensitivity
+python -m experiments.run --suite tail --reps 100 --workers 4 --output-root results_sensitivity
+python -m experiments.sensitivity_tables --input results_sensitivity/aggregate_summary.csv --output results_sensitivity/sensitivity_tables.tex
+```
+
+The two tables report prediction MSE with Monte Carlo SE, plus squared population Huber target bias for the stable-tail sweep. The errors are measured against `f0`, including for skewed noise. `--min-reps` can render a completed smaller pilot; label such tables as preliminary. The generator checks that every case has the requested number of replications and all five methods. LaTeX requires `booktabs`, `multirow`, and `adjustbox`.
+
+The completed 100-replication results are committed under `reference/sensitivity_aggregate_summary.csv`, `reference/sensitivity_paired_differences.csv`, and `reference/sensitivity_tables.tex`. The paired-difference file reports the mean and Monte Carlo SE of within-replication MSE reductions, with positive values favoring the second method. Raw per-replication fits remain in the ignored local `results_sensitivity` directory. Regenerate the reference table with `python -m experiments.sensitivity_tables --input reference/sensitivity_aggregate_summary.csv --output reference/sensitivity_tables.tex`.
 
 ## Real-data forecasting: four-task benchmark
 
