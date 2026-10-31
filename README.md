@@ -58,6 +58,15 @@ python -m experiments.tables --input reference/aggregate_summary.csv --output re
 
 To include the generated TeX in a paper, load `booktabs`, `multirow`, and `adjustbox` and use `\input{.../paper_tables.tex}`. The generated table file is a reference rendering of prior results; it does not replace running the experiments.
 
+Check all six numerical-study tables (the original four plus the two sensitivity tables) against the committed 100-replication CSV summaries with one command:
+
+```bash
+python -m experiments.reproduce_tables --check
+python -m experiments.reproduce_tables --output-dir results_tables
+```
+
+The first command regenerates both TeX files in a temporary directory, compares them byte for byte with `reference/`, and checks that cases shared by the two summary CSVs agree. The second writes fresh TeX copies to `results_tables/`. This verifies exact table rendering from the committed summaries; rerunning model fits is a separate step and may produce small platform-dependent differences.
+
 ## Checks
 
 ```bash
