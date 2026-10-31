@@ -21,14 +21,14 @@ class SensitivityTests(unittest.TestCase):
         self.assertEqual({case.beta for case in dependence if case.family == "C"}, {0.7})
         self.assertEqual({case.beta for case in dependence if case.family != "C"}, {0.0})
         tail = cases_for("tail")
-        self.assertEqual(len(tail), 6)
+        self.assertEqual(len(tail), 9)
         self.assertEqual(
-            {(case.alpha, case.beta) for case in tail},
-            {(alpha, beta) for alpha in (1.35, 1.5, 1.8)
-             for beta in (0, 0.7)},
+            {(case.family, case.alpha, case.beta) for case in tail},
+            {(family, alpha, 0.7 if family == "C" else 0.0)
+             for family in "ABC" for alpha in (1.35, 1.5, 1.8)},
         )
         self.assertEqual({case.tau for case in tail}, {14.0})
-        self.assertEqual(len({case.case_id for case in dependence + tail}), 33)
+        self.assertEqual(len({case.case_id for case in dependence + tail}), 36)
 
     def test_tables_require_complete_replicated_results(self):
         index = {}
@@ -48,8 +48,10 @@ class SensitivityTests(unittest.TestCase):
         for dgp in (1, 2, 3):
             self.assertIn(rf"\multirow{{9}}{{*}}{{DGP {dgp}}}", dependence_table)
         tail_table = render_tail(index, 2)
-        self.assertEqual(tail_table.count("0.0250"), 6)
-        self.assertEqual(tail_table.count(r"\textbf{0.1000(0.0020)}"), 6)
+        self.assertEqual(tail_table.count("0.0250"), 9)
+        self.assertEqual(tail_table.count(r"\textbf{0.1000(0.0020)}"), 9)
+        for dgp in (1, 2, 3):
+            self.assertIn(rf"\multirow{{3}}{{*}}{{DGP {dgp}}}", tail_table)
         with self.assertRaisesRegex(ValueError, "Only 2 replications"):
             render_tail(index, 3)
         del index[(next(case for case in cases_for("dependence")
@@ -59,7 +61,7 @@ class SensitivityTests(unittest.TestCase):
 
     def test_reference_results_cover_all_sensitivity_cases(self):
         index = load_summaries(ROOT / "reference/sensitivity_aggregate_summary.csv")
-        self.assertEqual(len(index), 33 * len(METHODS))
+        self.assertEqual(len(index), 36 * len(METHODS))
         rendered = "\n\n".join([
             render_dependence(index, 100),
             render_tail(index, 100),
