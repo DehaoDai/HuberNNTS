@@ -69,7 +69,7 @@ The sanity command checks the exact sparse comparator, compact support of `X`, s
 
 ## Dependence and stable-tail sensitivity
 
-The `dependence` suite varies both AR coefficients over `{0, 0.5, 0.8}` for each of DGPs 1, 2, and 3 (nine settings per DGP, 27 total). DGP 3 uses skewed stable errors (`beta=0.7`); DGPs 1 and 2 use symmetric errors. All have `alpha=1.5`, `n=800`, `d=256`, and `tau=8`. Within each DGP, the marginal distributions of covariates and errors are held fixed as dependence changes. The renderer writes a separate dependence table for each DGP so each nine-row grid fits on a page.
+The `dependence` suite varies both AR coefficients over `{0, 0.5, 0.8}` for each of DGPs 1, 2, and 3 (nine settings per DGP, 27 total). DGP 3 uses skewed stable errors (`beta=0.7`); DGPs 1 and 2 use symmetric errors. All have `alpha=1.5`, `n=800`, `d=256`, and `tau=8`. Within each DGP, the marginal distributions of covariates and errors are held fixed as dependence changes. The renderer writes one dependence table with a `Data` column grouping nine rows per DGP; `adjustbox` fits its width to the text area.
 
 The `tail` suite crosses stable indices `{1.35, 1.5, 1.8}` with symmetric (`beta=0`) and skewed (`beta=0.7`) errors (six settings). It uses DGP 1's sparse ReLU signal and DGP 3's skewed-noise convention, at `n=800` and `d=256`. There are 33 distinct settings across both suites. Stable scales are matched by marginal IQR across tail settings. The Huber threshold is held at 14 throughout the tail suite, satisfying the configured curvature check even at `alpha=1.35`.
 
@@ -83,7 +83,7 @@ python -m experiments.run --suite tail --reps 100 --workers 4 --output-root resu
 python -m experiments.sensitivity_tables --input results_sensitivity/aggregate_summary.csv --output results_sensitivity/sensitivity_tables.tex
 ```
 
-The four tables report prediction MSE with Monte Carlo SE, plus squared population Huber target bias for the stable-tail sweep. The errors are measured against `f0`, including for skewed noise. `--min-reps` can render a completed smaller pilot; label such tables as preliminary. The generator checks that every case has the requested number of replications and all five methods. As with the main paper tables, LaTeX requires `booktabs` and `adjustbox`.
+The two tables report prediction MSE with Monte Carlo SE, plus squared population Huber target bias for the stable-tail sweep. The errors are measured against `f0`, including for skewed noise. `--min-reps` can render a completed smaller pilot; label such tables as preliminary. The generator checks that every case has the requested number of replications and all five methods. LaTeX requires `booktabs`, `multirow`, and `adjustbox`.
 
 The completed 100-replication results are committed under `reference/sensitivity_aggregate_summary.csv`, `reference/sensitivity_paired_differences.csv`, and `reference/sensitivity_tables.tex`. The paired-difference file reports the mean and Monte Carlo SE of within-replication MSE reductions, with positive values favoring the second method. Raw per-replication fits remain in the ignored local `results_sensitivity` directory. Regenerate the reference table with `python -m experiments.sensitivity_tables --input reference/sensitivity_aggregate_summary.csv --output reference/sensitivity_tables.tex`.
 
