@@ -38,27 +38,36 @@ def render_dependence(index, min_reps):
 
 def render_tail(index, min_reps):
     body = []
-    for case in cases_for("tail"):
-        row = index.get((case.case_id, "Huber-DNN"))
-        if row is None:
-            raise ValueError(f"Missing Huber-DNN for {case.case_id}")
-        bias_sq = float(row["mean_population_target_bias_sq"])
-        body.append(" & ".join([
-            f"{case.alpha:g}", f"{case.beta:g}", f"{case.tau:g}",
-            f"{bias_sq:.4f}",
-            *method_cells(index, case, METHODS, min_reps),
-        ]) + r"\\")
+    cases = cases_for("tail")
+    for family in ("A", "B", "C"):
+        if body:
+            body.append(r"\midrule")
+        family_cases = [case for case in cases if case.family == family]
+        for i, case in enumerate(family_cases):
+            row = index.get((case.case_id, "Huber-DNN"))
+            if row is None:
+                raise ValueError(f"Missing Huber-DNN for {case.case_id}")
+            bias_sq = float(row["mean_population_target_bias_sq"])
+            data = (rf"\multirow{{3}}{{*}}{{DGP {ord(family) - 64}}}"
+                    if i == 0 else "")
+            body.append(" & ".join([
+                data, f"{case.alpha:g}", f"{case.beta:g}", f"{case.tau:g}",
+                f"{bias_sq:.4f}",
+                *method_cells(index, case, METHODS, min_reps),
+            ]) + r"\\")
     return table(
-        r"Stable-tail and skewness sweep at $n=800$, $d=256$, "
+        r"Stable-tail sweep for DGPs 1--3 at $n=800$, $d=256$, "
         r"$(\rho_X,\rho_\varepsilon)=(0.5,0.5)$. "
-        r"$\beta=0$ is symmetric and $\beta=0.7$ is skewed. "
+        r"DGPs 1 and 2 have symmetric errors ($\beta=0$); DGP 3 "
+        r"has skewed errors ($\beta=0.7$). DGPs 1 and 3 share the "
+        r"regression function, so their contrast isolates skewness. "
         r"Bias$^2$ is the squared gap between the clipped population Huber "
         r"target and $f_0$, averaged over the test covariates. "
         r"Other entries are prediction MSE (Monte Carlo SE); boldface marks "
         r"the best full-input estimator. The common $\tau=14$ "
         r"satisfies the stated curvature check.",
-        "tab:stable-tail-skew", "rrrrccccc",
-        r"$\alpha$ & $\beta$ & $\tau$ & Bias$^2$ & "
+        "tab:stable-tail-skew", "lrrrrccccc",
+        r"Data & $\alpha$ & $\beta$ & $\tau$ & Bias$^2$ & "
         + " & ".join(DISPLAY[method] for method in METHODS), body,
     )
 
