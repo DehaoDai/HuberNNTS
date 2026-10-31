@@ -146,10 +146,10 @@ def cases_for(suite):
         ]
     if suite == "tail":
         return [
-            Case("C" if beta else "A", 800, 256,
-                 alpha=alpha, beta=beta, tau=14.0)
+            Case(family, 800, 256, alpha=alpha,
+                 beta=0.7 if family == "C" else 0.0, tau=14.0)
+            for family in ("A", "B", "C")
             for alpha in (1.35, 1.5, 1.8)
-            for beta in (0.0, 0.7)
         ]
     if suite == "paper":
         # The four tables in the Numerical Studies manuscript.
