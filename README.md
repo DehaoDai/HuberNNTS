@@ -67,6 +67,24 @@ python -m experiments.run --suite sanity
 
 The sanity command checks the exact sparse comparator, compact support of `X`, serial dependence, and the moment condition used for Huber curvature.
 
+## Dependence and stable-tail sensitivity
+
+The `dependence` suite varies both AR coefficients over `{0, 0.5, 0.8}` (nine settings). The `tail` suite crosses stable indices `{1.35, 1.5, 1.8}` with symmetric (`beta=0`) and skewed (`beta=0.7`) errors (six settings). Both use DGP 1's signal, `n=800`, and `d=256`; the skewed cases use DGP 3's noise convention. There are 15 distinct settings. The marginal distributions of covariates and errors are held fixed as dependence changes. Stable scales are matched by marginal IQR across tail settings. The Huber threshold is held at 14 throughout the tail suite, satisfying the configured curvature check even at `alpha=1.35`; the dependence suite retains the paper's threshold of 8.
+
+Check the matrices, then run both suites into one output directory:
+
+```bash
+python -m experiments.run --suite dependence --dry-run --reps 100
+python -m experiments.run --suite tail --dry-run --reps 100
+python -m experiments.run --suite dependence --reps 100 --workers 4 --output-root results_sensitivity
+python -m experiments.run --suite tail --reps 100 --workers 4 --output-root results_sensitivity
+python -m experiments.sensitivity_tables --input results_sensitivity/aggregate_summary.csv --output results_sensitivity/sensitivity_tables.tex
+```
+
+The new tables report prediction MSE with Monte Carlo SE, plus squared population Huber target bias for the stable-tail sweep. The errors are measured against `f0`, including for skewed noise. `--min-reps` can render a completed smaller pilot; label such tables as preliminary. The generator checks that every case has the requested number of replications and all five methods. As with the main paper tables, LaTeX requires `booktabs` and `adjustbox`.
+
+The completed 100-replication results are committed under `reference/sensitivity_aggregate_summary.csv`, `reference/sensitivity_paired_differences.csv`, and `reference/sensitivity_tables.tex`. The paired-difference file reports the mean and Monte Carlo SE of within-replication MSE reductions, with positive values favoring the second method. Raw per-replication fits remain in the ignored local `results_sensitivity` directory. Regenerate the reference table with `python -m experiments.sensitivity_tables --input reference/sensitivity_aggregate_summary.csv --output reference/sensitivity_tables.tex`.
+
 ## Real-data forecasting: four-task benchmark
 
 This benchmark extends the **HuberNNTS** simulation study using four real-data forecasting targets. The four tasks were **selected post hoc** after screening six tasks for the lowest average MAE **and** RMSE under Huber-SPDNN at 30 random seeds. Results on this selected subset are descriptive and **not** an unbiased estimate of performance across all datasets. The original simulation study remains unchanged.
