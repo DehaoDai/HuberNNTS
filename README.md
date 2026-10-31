@@ -71,7 +71,7 @@ The sanity command checks the exact sparse comparator, compact support of `X`, s
 
 The `dependence` suite varies both AR coefficients over `{0, 0.5, 0.8}` for each of DGPs 1, 2, and 3 (nine settings per DGP, 27 total). DGP 3 uses skewed stable errors (`beta=0.7`); DGPs 1 and 2 use symmetric errors. All have `alpha=1.5`, `n=800`, `d=256`, and `tau=8`. Within each DGP, the marginal distributions of covariates and errors are held fixed as dependence changes. The renderer writes one dependence table with a `Data` column grouping nine rows per DGP; `adjustbox` fits its width to the text area.
 
-The `tail` suite crosses stable indices `{1.35, 1.5, 1.8}` with symmetric (`beta=0`) and skewed (`beta=0.7`) errors (six settings). It uses DGP 1's sparse ReLU signal and DGP 3's skewed-noise convention, at `n=800` and `d=256`. There are 33 distinct settings across both suites. Stable scales are matched by marginal IQR across tail settings. The Huber threshold is held at 14 throughout the tail suite, satisfying the configured curvature check even at `alpha=1.35`.
+The `tail` suite varies stable indices `{1.35, 1.5, 1.8}` for each of DGPs 1, 2, and 3 (nine settings). DGPs 1 and 2 retain symmetric errors (`beta=0`); DGP 3 retains skewed errors (`beta=0.7`). DGPs 1 and 3 share the same regression function, so their contrast isolates the noise skewness; DGP 2 has a different signal and is shown as a separate robustness setting. All use `n=800` and `d=256`. There are 36 distinct settings across both suites. Stable scales are matched by marginal IQR across tail settings. The Huber threshold is held at 14 throughout the tail suite, satisfying the configured curvature check even at `alpha=1.35`.
 
 Check the matrices, then run both suites into one output directory:
 
